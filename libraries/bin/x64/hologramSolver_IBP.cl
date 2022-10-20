@@ -16,9 +16,9 @@ __kernel void computeFandB(global float4* transducerPositionsWorld,
 	global float4* positions,
 	global float4* matrixG0,
 	global float4* matrixGN,
-	read_only int pointsPerGeometry,
-	read_only int numGeometries,
-	read_only image2d_t directivity_cos_alpha,
+	int pointsPerGeometry,
+	int numGeometries,
+	image2d_t directivity_cos_alpha,
 	global float2* pointHologram,
 	global float2* unitaryPointHologram
 ) {
@@ -107,6 +107,7 @@ __kernel void solvePhases_IBP(
 	global float* finalHologram_Phases, //this contains the final phases to send to the array (with lev signature, phase only, A=1)
 	global float* finalHologram_Amplitudes, //this contains the final phases to send to the array (with lev signature, phase only, A=1)
 	global float2* finalHologram_ReIm   //this contains the "focussing hologram" (Re and Im parts, no lev signature)
+
 ) {
 	//SET-UP ENVIRONMENT: Each CU represents a transducer. The group is for all transducers in a geometry 
 	int transducer = get_local_id(0);
@@ -176,9 +177,8 @@ __kernel void solvePhases_IBP(
 	float transducerAmplitude = native_sqrt(finalTransducerState.x*finalTransducerState.x + finalTransducerState.y*finalTransducerState.y);
 	finalTransducerState /= transducerAmplitude;
 	finalHologram_ReIm[geometry*NUM_TRANSDUCERS + transducer] = finalTransducerState;
-	float topBoard = (float)(transducer >= 256);
-	finalHologram_Phases[geometry*NUM_TRANSDUCERS + transducer] = (atan2(finalTransducerState.y, finalTransducerState.x)+PI*topBoard);
-	finalHologram_Amplitudes[geometry*NUM_TRANSDUCERS + transducer] = fmin(transducerAmplitude, 1.f);
+	finalHologram_Phases[geometry*NUM_TRANSDUCERS + transducer] = (atan2(finalTransducerState.y, finalTransducerState.x));
+	finalHologram_Amplitudes[geometry*NUM_TRANSDUCERS + transducer] = 1;
 	
 	//DEBUG:
 	/*finalHologram_ReIm[geometry*NUM_TRANSDUCERS + transducer] = (float2)(transducer, geometry);

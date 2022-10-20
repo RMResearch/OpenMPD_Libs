@@ -52,7 +52,7 @@ __kernel void computeFandB(global float4* transducerPositionsWorld,
 		, dot(ourMatrix[2], local_p_pos)
 		, dot(ourMatrix[3], local_p_pos));
 	//DEBUG: Debugging behaviour of matrices: It can stay, it does not break anything.
-	//positions[point_] = p_pos;
+	positions[point_] = p_pos;
 	//END DEBUG
 
 	//B. Get the position of our transducer 

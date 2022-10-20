@@ -1,6 +1,6 @@
 //#define NUM_TRANSDUCERS 1024		//We will make this a compile-time argument.
 #define NUM_TRANSDUCERS_PER_GROUP 256 //TODO: Make this an argument.
-#define MAX_POINTS_PER_GEOMETRY 16
+#define MAX_POINTS_PER_GEOMETRY 8
 #define NUM_ITERATIONS 20
 #define PI 3.14159265359f
 #define K 726.379761f
@@ -16,9 +16,9 @@ __kernel void computeFandB(global float4* transducerPositionsWorld,
 	global float4* positions,
 	global float4* matrixG0,
 	global float4* matrixGN,
-	read_only int pointsPerGeometry,
-	read_only int numGeometries,
-	read_only image2d_t directivity_cos_alpha,
+	int pointsPerGeometry,
+	int numGeometries,
+	image2d_t directivity_cos_alpha,
 	global float2* pointHologram,
 	global float2* unitaryPointHologram
 ) {
@@ -116,22 +116,19 @@ __kernel void solvePhases_Naive(
 	//Copy propagator value to this transducer, for each point. 
 	float2 _F_z_t[MAX_POINTS_PER_GEOMETRY]; 
 	for (int z = 0; z < numPoints; z++)
-		_F_z_t[z] = F[numPoints * geometry * NUM_TRANSDUCERS + z*NUM_TRANSDUCERS + transducer]* amplitudesPerPoint[numPoints * geometry + z];
+		_F_z_t[z] = F[numPoints * geometry * NUM_TRANSDUCERS + z*NUM_TRANSDUCERS + transducer];
 	//RETRIEVE FINAL SOLUTION
 	//1. Back propagate: 
 	float2 finalTransducerState= (float2)(0, 0);
 	for (int z = 0; z < numPoints; z++) {
 		finalTransducerState += _F_z_t[z];
 	}
-
 	//2. Constraint transducers amplitude and safe:
 	float transducerAmplitude = native_sqrt(finalTransducerState.x*finalTransducerState.x + finalTransducerState.y*finalTransducerState.y);
 	finalTransducerState /= transducerAmplitude;
 	finalHologram_ReIm[geometry*NUM_TRANSDUCERS + transducer] = finalTransducerState;
-	float topBoard = (float)(transducer >= 256);
-	finalHologram_Phases[geometry*NUM_TRANSDUCERS + transducer] = (atan2(finalTransducerState.y, finalTransducerState.x)+PI*topBoard);
-	finalHologram_Amplitudes[geometry*NUM_TRANSDUCERS + transducer] = fmin(transducerAmplitude, 1.f);
-	//finalHologram_Amplitudes[geometry*NUM_TRANSDUCERS + transducer] = 1;//PURE NAIVE
+	finalHologram_Phases[geometry*NUM_TRANSDUCERS + transducer] = (atan2(finalTransducerState.y, finalTransducerState.x));
+	finalHologram_Amplitudes[geometry*NUM_TRANSDUCERS + transducer] = 1;
 	
 	//DEBUG:
 	/*finalHologram_ReIm[geometry*NUM_TRANSDUCERS + transducer] = (float2)(transducer, geometry);
