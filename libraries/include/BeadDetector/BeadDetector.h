@@ -80,7 +80,18 @@ public:
 		threshold = value; 
 	}
 
-	void initInstance(int cameraID, float p1_World[3], float p2_World[3], float p3_World[3], float p4_World[3], int pixelsPerMeter = 5000, int threshold = 100, int erodeDilate = 2, float sphericity = 0.4f, float minRadiusInMeters = 0.001f, float maxRadiusInMeters = 0.005f, bool visualize = false) {
+	/**
+		Initializes the detector, with a given USB camera ID
+		and the coordinates of 4 points selected from the camera.
+			- cameraID: Device ID as listed by OpenCV
+			- tl_World: top left point in the camera feed. The 3D coordinates should be provided in World coordinates (e.g. the space you want for the detector's output).
+			- bl_World: bottom left point in the camera feed. The 3D coordinates should be provided in World coordinates (e.g. the space you want for the detector's output).
+			- br_World: bottom right point in the camera feed. The 3D coordinates should be provided in World coordinates (e.g. the space you want for the detector's output).
+			- tr_World: top right point in the camera feed. The 3D coordinates should be provided in World coordinates (e.g. the space you want for the detector's output).
+		The order in which these 4 points are clicked does not matter, but their position in the image does. 
+	*/
+
+	void initInstance(int cameraID, float tl_World[3], float bl_World[3], float br_World[3], float tr_World[3], int pixelsPerMeter = 5000, int threshold = 100, int erodeDilate = 2, float sphericity = 0.4f, float minRadiusInMeters = 0.001f, float maxRadiusInMeters = 0.005f, bool visualize = false) {
 		webcamID = cameraID;
 		
 		Detector::pixelsPerMeter = pixelsPerMeter;
@@ -95,14 +106,14 @@ public:
 		pthread_mutex_init(&curPointsAccess, NULL);
 
 		//Store the position (relative to OpenGLFramework) where the four corners are placed
-		cornerPoints.push_back(cv::Point3d(p1_World[0], p1_World[0], p1_World[0]));
-		cornerPoints.push_back(cv::Point3d(p2_World[0], p2_World[0], p2_World[0]));
-		cornerPoints.push_back(cv::Point3d(p3_World[0], p3_World[0], p3_World[0]));
-		cornerPoints.push_back(cv::Point3d(p4_World[0], p4_World[0], p4_World[0]));
+		cornerPoints.push_back(cv::Point3d(tl_World[0], tl_World[0], tl_World[0]));
+		cornerPoints.push_back(cv::Point3d(bl_World[0], bl_World[0], bl_World[0]));
+		cornerPoints.push_back(cv::Point3d(br_World[0], br_World[0], br_World[0]));
+		cornerPoints.push_back(cv::Point3d(tr_World[0], tr_World[0], tr_World[0]));
 		//Store derived parameters
-		_horizontalAxis = cv::Point3d(p2_World[0] - p3_World[0], p2_World[1] - p3_World[1], p2_World[2] - p3_World[2]);
-		_verticalAxis = cv::Point3d(p4_World[0] - p3_World[0], p4_World[1] - p3_World[1], p4_World[2] - p3_World[2]);
-		_imageOrigin = cv::Point3d(p3_World[0], p3_World[1], p3_World[2]);
+		_horizontalAxis = cv::Point3d(bl_World[0] - br_World[0], bl_World[1] - br_World[1], bl_World[2] - br_World[2]);
+		_verticalAxis = cv::Point3d(tr_World[0] - br_World[0], tr_World[1] - br_World[1], tr_World[2] - br_World[2]);
+		_imageOrigin = cv::Point3d(br_World[0], br_World[1], br_World[2]);
 		_imageWidth = (int)(pixelsPerMeter * sqrt(_horizontalAxis.x * _horizontalAxis.x + _horizontalAxis.y * _horizontalAxis.y + _horizontalAxis.z * _horizontalAxis.z));
 		_imageHeight = (int)(pixelsPerMeter * sqrt(_verticalAxis.x * _verticalAxis.x + _verticalAxis.y * _verticalAxis.y + _verticalAxis.z * _verticalAxis.z));
 		_printMessage("[BeadDetector] Instance initialized\n");
