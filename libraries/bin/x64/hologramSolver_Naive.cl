@@ -124,7 +124,7 @@ __kernel void solvePhases_Naive(
 	//1. Back propagate: 
 	float2 finalTransducerState= (float2)(0, 0);
 	for (int z = 0; z < numPoints; z++) {
-		finalTransducerState += _F_z_t[z];
+		finalTransducerState += _F_z_t[z]*amplitudesPerPoint[geometry*numPoints + z];
 	}
 	//2. Constraint transducers amplitude and safe:
 	float transducerAmplitude = native_sqrt(finalTransducerState.x*finalTransducerState.x + finalTransducerState.y*finalTransducerState.y);
