@@ -13,7 +13,6 @@ __constant sampler_t sampleDirTexture = CLK_NORMALIZED_COORDS_TRUE |
 CLK_ADDRESS_NONE | CLK_FILTER_NEAREST; 
 
 __kernel void computeFandB(global float4* transducerPositionsWorld,
-	global float4* transducerNormals,
 	global float4* positions,
 	global float4* matrixG0,
 	global float4* matrixGN,
@@ -59,9 +58,9 @@ __kernel void computeFandB(global float4* transducerPositionsWorld,
 	float4 transducerToPoint = p_pos - t_pos;
 	float distance = native_sqrt(transducerToPoint.x * transducerToPoint.x + transducerToPoint.y * transducerToPoint.y + transducerToPoint.z * transducerToPoint.z);
 	//This computes cos_alpha ASSUMING transducer normal is (0,0,1); Divide by dist to make unitary vector (normalise). 
-	//float cos_alpha = fabs((float)(transducerToPoint.z / distance));
-	float4 t_norm = transducerNormals[t_offset];
-	float cos_alpha = fabs((transducerToPoint.x * t_norm.x + transducerToPoint.y * t_norm.y + transducerToPoint.z * t_norm.z) / distance);
+	float cos_alpha = fabs((float)(transducerToPoint.z / distance));
+	//float4 t_norm = transducerNormals[t_offset];
+	//float cos_alpha = fabs((transducerToPoint.x * t_norm.x + transducerToPoint.y * t_norm.y + transducerToPoint.z * t_norm.z) / distance);
 
 	//DEBUG:
 	//float Re = cos(-K*distance);// distance; //cos(t_offset*PI/(1024));
