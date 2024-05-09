@@ -18,7 +18,7 @@ __kernel void computeFandB(global float4* transducerPositionsWorld,
 	global float4* matrixGN,
 	int pointsPerGeometry,
 	int numGeometries,
-	image2d_t directivity_cos_alpha,
+	read_only image2d_t directivity_cos_alpha,
 	global float2* pointHologram,
 	global float2* unitaryPointHologram
 ) {

@@ -19,7 +19,7 @@ __kernel void computeFandB(global float4* transducerPositionsWorld,
 	global float4* matrixGN,
 	int pointsPerGeometry,
 	int numGeometries,
-	image2d_t directivity_cos_alpha,
+	read_only image2d_t directivity_cos_alpha,
 	global float2* pointHologram,
 	global float2* unitaryPointHologram
 ) {
@@ -119,7 +119,7 @@ __kernel void solvePhases_Naive(
 	//Copy propagator value to this transducer, for each point. 
 	float2 _F_z_t[MAX_POINTS_PER_GEOMETRY]; 
 	for (int z = 0; z < numPoints; z++)
-		_F_z_t[z] = F[numPoints * geometry * NUM_TRANSDUCERS + z*NUM_TRANSDUCERS + transducer]*amplitudesPerPoint[numPoints * geometry + z];
+		_F_z_t[z] = F[numPoints * geometry * NUM_TRANSDUCERS + z*NUM_TRANSDUCERS + transducer];
 	//RETRIEVE FINAL SOLUTION
 	//1. Back propagate: 
 	float2 finalTransducerState= (float2)(0, 0);

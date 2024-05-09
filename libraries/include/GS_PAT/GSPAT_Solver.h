@@ -42,6 +42,11 @@ namespace GSPAT {
 			return numParameters==0; 
 		}
 
+		virtual bool updateConfigParameter(unsigned int label, void* parameter) {
+			//By default, no parameters are accepted. 
+			return false;
+		}
+
 		/**
 			Returns a solution with the appropriate configuration, which the client can then use to compute the required transducer activation.
 			- numPoints: Points in each geometry

@@ -106,6 +106,9 @@ namespace OpenMPD {
 	/** updateBoardLocation: Modifies the location of each of the boards in the setup. The client must provide one matrix for each board (this is not checked and the method will fail). 
 	*/
 	_OPEN_MPD_ENGINE_Export void updateBoardLocations(float* boardsToLevitatorOrigi);
+	/**	updateConfigParameter: Updates a solver parameter. Client must know the options available to the solver being used and the correct way to encode its values as void*.
+	*/
+	_OPEN_MPD_ENGINE_Export bool updateConfigParameter(unsigned int label, void* parameter);
 	/**	setupFPS_Divider: Adjusts the global rendering speed of the engine, by setting a "divider".
 		Dividers are used to ensure hardware controlled framerates, using 40KHz as the base frequency:
 				- Divider 1--> Update boards at 40KHz
